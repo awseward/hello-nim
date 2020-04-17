@@ -1,17 +1,14 @@
-type
-  Thing = ref object of RootObj
-  Unit = ref object of Thing
-    x: int
+iterator count0(): int {.closure.} =
+  yield 0
 
-method m(a: Thing) {.base.} =
-  echo "Thing"
+iterator count2(): int {.closure.} =
+  var x = 1
+  yield x
+  inc x
+  yield x
 
-method m(a: Unit) =
-  # Call the base method:
-  procCall m(a.Thing)
-  echo "Unit: ", a.x
+proc invoke(iter: iterator(): int {.closure.}) =
+  for x in iter(): echo x
 
-let u = new(Unit)
-u.x = 19
-
-u.m
+invoke(count0)
+invoke(count2)
