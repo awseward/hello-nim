@@ -1,13 +1,11 @@
-# Whilst the syntax of type classes appears to resemble that of ADTs/algebraic
-# data types in ML-like languages, it should be understood that type classes
-# are static constraints to be enforced at type instantations. Type classes are
-# not really types in themsleves, but are instead a system of providing generic
-# "checks" that ultimately resolve to some singular type. Type classes do not
-# allow for runtime type dynamism, unlike object variants or methods.
-#
-# As an example, the following would not compile:
+proc onlyIntOrString[T: int|string](x, y: T) = discard
 
-type Typeclass = int | string
+onlyIntOrString(123, 456)
+# onlyIntOrString(1.0, true) #type mismatch
+# onlyIntOrString("xy", 50) # invalid as 'T' cannot be both at the same time
 
-var foo: TypeClass = 2
-foo = "this will not compile"
+# Would need sthng like this
+proc hmm[T, U: int|string](x: T, y: U) = discard
+hmm 123, 456
+hmm "xy", 50
+hmm 420, "yolo"
