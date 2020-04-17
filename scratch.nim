@@ -1,16 +1,17 @@
-proc g[T](f: proc(x: T); x: T) = f x
+type
+  Index = distinct int
 
-proc c(y: int) = echo y
-proc v(y: var int) =
-  y += 100
+proc `$`(i: Index): string {.borrow.}
+proc `==` (a, b: Index): bool {.borrow.}
+proc `+` (a, b: Index): Index {.borrow.}
 
-var i: int
+proc `+` (a, b: (int, Index)): (int, Index) =
+  # FIXME
+  return (a[0] + b[0], a[1] + b[1])
 
-# allowed: infers 'T' to be of type 'int'
-g(c, 42)
 
-# not valid: 'T' is not inferred to be of type 'var int'
-g(v, i)
+var a = (1, 3.Index)
+var b = (2, 4.Index)
 
-# also not allowed: explict instantiation via 'var int'
-g[var int](v, i)
+echo a == b
+echo a + b
