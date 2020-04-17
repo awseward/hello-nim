@@ -1,7 +1,11 @@
-template typedef(name: untyped, typ: typedesc) =
-  type
-    `T name`* {.inject.} = typ
-    `P name`* {.inject.} = ref `T name`
+# module 'm'
 
-typedef(myint, int)
-var x: PMyInt
+type
+  Lev = enum levA, levB
+
+var abclev = levB
+
+template tstLev(abclev: Lev) =
+  echo abclev, "", m.abclev
+
+tstLev(levA)
