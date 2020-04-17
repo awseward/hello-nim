@@ -1,22 +1,17 @@
-# The bind statement is the counterpart to the mixin statement. It can be used
-# to explicitly declare identifiers that should be bound early (i.e. the
-# identifiers should be looked up in the scope of the template/generic
-# definition):
+template `!=` (a,b: untyped): untyped =
+  # this definition exists in the System module
+  not (a == b)
 
-# module A
-var
-  lastId = 0
+assert(5 != 6) # the compiler rewrites that to: assert(not (5 ==6))
 
-template genId*: untyped =
-  bind lastId
-  inc lastId
-  lastId
+assert(6 != 6) # won't compile
 
-# module B
-import A
+# The !=, >, >=, in, notin, isnot operators are in fact templates:
 
-echo genId()
+# a > b is transformed into b < a.
+# a in b is transformed into contains(b, a).
+# notin and isnot have the obvious meanings.
 
-# But a bind is rarely useful because symbol binding from the definition scope is the default.
-
-# bind statements only make sense in templates and generics.
+# The "types" of templates can be the symbols untyped, typed or typedesc. These
+# are "meta types", they can only be used in certain contexts. Regular types
+# can be used too; this implies that typed expressions are expected.
