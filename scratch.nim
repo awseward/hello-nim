@@ -1,17 +1,8 @@
-import macros
+# Style note: For code readability, it is the best idea to use the least
+# powerful programming construct that still suffices. So the "check list" is:
 
-macro debug(n: varargs[typed]): untyped =
-  result = newNimNode(nnkStmtList, n)
-  for x in n:
-    add(result, newCall(bindSym"write", bindSym"stdout", newStrLitNode("[DEBUG] ")))
-    add(result, newCall(bindSym"write", bindSym"stdout", toStrlit(x)))
-    add(result, newCall(bindSym"write", bindSym"stdout", newStrLitNode(": ")))
-    add(result, newCall(bindSym"writeLine", bindSym"stdout", x))
+# Use an ordinary proc/iterator, if possible.
+# Else: Use a generic proc/iterator, if possible.
+# Else: Use a template, if possible.
+# Else: Use a macro.
 
-var
-  a: array[0..10, int]
-  x = "some string"
-a[0] = 42
-a[1] = 45
-
-debug(a[0], a[1], x)
