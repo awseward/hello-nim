@@ -1,19 +1,13 @@
-type IO = object ## input/output effect
-proc readLine(): string {.tags: [IO].} = discard
+# Whilst the syntax of type classes appears to resemble that of ADTs/algebraic
+# data types in ML-like languages, it should be understood that type classes
+# are static constraints to be enforced at type instantations. Type classes are
+# not really types in themsleves, but are instead a system of providing generic
+# "checks" that ultimately resolve to some singular type. Type classes do not
+# allow for runtime type dynamism, unlike object variants or methods.
+#
+# As an example, the following would not compile:
 
-proc no_IO_please() {.tags: [].} =
-  # the compiler prevents this:
-  #   Error: can have an unlisted effect: IO
-  # let x = readLine()
-  discard
+type Typeclass = int | string
 
-# The effects pragma has been designed to assist the programmer with the
-# effects analysis. It is a statement that makes the compiler output all
-# inferred effects up to the effects's position:
-
-proc p(what: bool) =
-  if what:
-    raise newException(IOError, "IO")
-    {.effects.}
-  else:
-    raise newException(OSError, "OS")
+var foo: TypeClass = 2
+foo = "this will not compile"
