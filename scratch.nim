@@ -1,17 +1,40 @@
-template `!=` (a,b: untyped): untyped =
-  # this definition exists in the System module
-  not (a == b)
+template declareInt(x: untyped) =
+  var x: int
 
-assert(5 != 6) # the compiler rewrites that to: assert(not (5 ==6))
+template declareInt2(x: typed) =
+  var x: int
 
-assert(6 != 6) # won't compile
+declareInt(a)
+a = 3
 
-# The !=, >, >=, in, notin, isnot operators are in fact templates:
+# declareInt2(b) # invalid, because x has not been declared and so has no type
 
-# a > b is transformed into b < a.
-# a in b is transformed into contains(b, a).
-# notin and isnot have the obvious meanings.
+template withFile(f, fn, mode, actions: untyped): untyped =
+  var f: File
+  if open(f, fn, mode):
+    try:
+      actions
+    finally:
+      close(f)
+  else:
+    quit("cannot open: " & fn)
 
-# The "types" of templates can be the symbols untyped, typed or typedesc. These
-# are "meta types", they can only be used in certain contexts. Regular types
-# can be used too; this implies that typed expressions are expected.
+withFile(txt, "ttempl3.txt", fmWrite):
+  txt.writeLine("line 1")
+  txt.writeLine("line 2")
+
+# Usually to pass a block of code to a template the parameter that accepts the
+# block needs to be of type untyped. Because symbol lookups are then delayed
+# until template instantiation time:
+template t(body: typed) =
+  block:
+    echo "t!!"
+    body
+
+t:
+  var i = 1
+  echo i
+
+t:
+  var i = 2 # compile error (Error: redefinition of 'i'; previous declaration here: ...)
+  echo i
