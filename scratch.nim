@@ -1,48 +1,19 @@
-# Nim supports exception tracking. The raises pragma can be used to explicitly
-# define which exceptions a proc/iterator/method/converter is allowed to raise.
-# The compiler verifies this:
+type IO = object ## input/output effect
+proc readLine(): string {.tags: [IO].} = discard
 
-type
-  LoadError* = object of Exception
-
-proc p(what: bool) {.raises: [IOError, OSError].} =
-  if what: raise newException(IOError, "IO")
-  # following line makes compiler error :)
-  # elif true: raise newException(LoadError, "wat")
-  else: raise newException(OSError, "OS")
-
-# A raises list can also be attached to a proc type. This affects type
-# compatibility:
-
-type
-  Callback = proc (s: string) {.raises: [IOError].}
-
-var c: Callback
-
-proc pWrong(x: string) = raise newException(OSError, "OS")
-
-proc pRight(x: string) {.raises: [IOError].} =
-  echo x
+proc no_IO_please() {.tags: [].} =
+  # the compiler prevents this:
+  #   Error: can have an unlisted effect: IO
+  # let x = readLine()
   discard
 
-# Error: type mismatch: got <None> but expected 'Callback = proc (s: string){.closure.}'
-# c = p
+# The effects pragma has been designed to assist the programmer with the
+# effects analysis. It is a statement that makes the compiler output all
+# inferred effects up to the effects's position:
 
-# Okay!
-c = pRight
-
-c "hi"
-
-# -------------
-
-proc noRaise(x: proc()) {.raises: [].} =
-  # unknown call that might raise anything, but valid:
-  x()
-
-proc doRaise() {.raises: [IOError].} =
-  raise newException(IOError, "IO")
-
-proc use() {.raises: [].} =
-  # doesn't compile! Can raise IOError!
-  # noRaise(doRaise)
-  discard
+proc p(what: bool) =
+  if what:
+    raise newException(IOError, "IO")
+    {.effects.}
+  else:
+    raise newException(OSError, "OS")
