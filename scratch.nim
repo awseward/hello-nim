@@ -1,4 +1,7 @@
-import lib / [hello, goodbye]
+import lib/[
+  hello
+, goodbye
+]
 
 llo()
 gbye()
