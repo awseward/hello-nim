@@ -12,28 +12,28 @@ const bannerText = """
 
 type Colors = tuple[bg: string, fg: string]
 
-proc main() {.exportc.} =
-  # discard window.setInterval(() => echo "uhhhh", 500)
-  # discard setTimeout(() => echo "why", 1500)
-  let body = document.getElementsByTagName("body")[0]
-
+proc flipFlop(c: Colors, fn: proc(_: Colors)): proc() =
   var i = 0
-  proc flipFlop(c: Colors): Colors =
+  proc switch(): void =
     if i == 0:
       i = 1
-      result = c
+      fn c
     else:
       i = 0
-      result = (c[1], c[0])
+      let c = (c[1], c[0])
+      fn c
+  return switch
 
+
+proc main(_: Event) {.exportc.} =
+  let body = document.getElementsByTagName("body")[0]
   proc setColors(c: Colors): void =
-    let c = flipFlop c
     body.style.setProperty "background-color", c.bg
     body.style.setProperty "color",            c.fg
+  let flip = (bg: "#0074D9", fg: "#FFDC00").flipFlop(setcolors)
+  flip()
+  discard window.setInterval(flip, 500)
 
-  let c : Colors = (bg: "green", fg: "white")
-  discard window.setInterval(() => setColors(c), 80)
-
-document.addEventlistener("DOMContentLoaded", (ev: Event) => main())
+document.addEventlistener("DOMContentLoaded", main)
 
 {.hint: bannerText.}
